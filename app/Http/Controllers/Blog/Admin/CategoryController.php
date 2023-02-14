@@ -13,79 +13,71 @@ use App\Repositories\BlogCategoryRepository;
 
 class CategoryController extends BaseController
 {
-    public function index()
+    public function index(Request $request)
     {
-        $paginator = BlogCategory::paginate(15);
-        return view('blog.admin.categories.index', compact('paginator'));
+        $frd = $request->all();
+        $blogCategories = BlogCategory::paginate(15);
+        return view('blog.admin.categories.index', compact('blogCategories', 'frd'));
     }
 
     public function create()
     {
-        $item = new BlogCategory();
-        $categoryList = BlogCategory::all();
+        $categoryList = BlogCategory::pluck('title', 'id')->toArray();
 
-        return view('blog.admin.categories.edit',
-            compact('item', 'categoryList'));
+        return view('blog.admin.categories.create', compact('categoryList'));
     }
 
     public function store(BlogCategoryCreateRequest $request)
     {
+
         $data = $request->input();
         if (empty($data['slug'])) {
             $data['slug'] = str_slug($data(['title']));
         }
 
         // Создаст объект и добавит в БД
-        $item = (new BlogCategory())->create($data);
+        $blogCategory = (new BlogCategory())->create($data);
 
-        if ($item) {
-            return redirect()
-                ->route('blog.admin.categories.edit', [$item->id])
+        if ($blogCategory) {
+            $response = redirect()
+                ->route('blog.admin.categories.edit', compact('blogCategory'))
                 ->with(['success' => 'Успешно сохранено']);
         } else {
-            return back()
+            $response = back()
                 ->withErrors(['msg' => 'Ошибка сохранения'])
                 ->withInput();
         }
+
+        return $response;
     }
 
-    public function edit($id, BlogCategoryRepository $categoryRepository)
+    public function edit(BlogCategory $blogCategory)
     {
-        $item = $categoryRepository->getEdit($id);
-        if (empty($item)) {
-            abort(404);
-        }
-
-        $categoryList = $categoryRepository->getForComboBox();
+        $categoryList = BlogCategory::pluck('title', 'id')->toArray();
 
         return view('blog.admin.categories.edit',
-            compact('item', 'categoryList'));
+            compact('blogCategory', 'categoryList'));
     }
 
-    public function update(BlogCategoryUpdateRequest $request, $id)
+    public function update(BlogCategoryUpdateRequest $request, BlogCategory $blogCategory)
     {
-        $item = BlogCategory::find($id);
-        if (empty($item)) {
-            return back()
-                ->withErrors(['msg' => "Запись id=[{$id}] не найдена"])
-                ->withInput();
-        }
-
         $data = $request->all();
         if (empty($data['slug'])) {
             $data['slug'] = str_slug($data(['title']));
         }
 
-        $result = $item->update($data);
+        $result = $blogCategory->update($data);
 
         if ($result) {
-            return redirect()
-                ->route('blog.admin.categories.edit', $item->id)
+            $response = redirect()
+                ->route('blog.admin.categories.edit', $blogCategory)
                 ->with(['success' => 'Успешно сохранено']);
         } else {
-            return back()
+            $response = back()
                 ->withErrors(['msg' => 'Ошибка сохранения'])
                 ->withInput();
         }
+
+        return $response;
     }
 }

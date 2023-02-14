@@ -1,3 +1,7 @@
+<?php
+/* @var \App\Models\BlogCategory $blogCategory */
+?>
+
 @extends('layouts.app')
 
 @section('content')
@@ -18,18 +22,21 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($paginator as $item)
-                                @php /* @var \App\Models\BlogCategory $item */ @endphp
+
+                            {{--                            TODO поменять везде на гетеры сетеры--}}
+                            @foreach($blogCategories as $blogCategory)
                                 <tr>
-                                    <td>{{ $item->id}}</td>
+                                    <td>{{ $blogCategory->id}}</td>
                                     <td>
-                                        <a href="{{ route('blog.admin.categories.edit', $item->id) }}">
-                                            {{ $item->title }}
+                                        <a href="{{ route('blog.admin.categories.edit', $blogCategory->id) }}">
+                                            {{ $blogCategory->getTitle() }}
                                         </a>
                                     </td>
-                                    <td @if(in_array($item->parent_id, [0, 1])) style="color: #ccc" @endif>
-                                        {{ $item->parent_id }}{{-- $item->parentCategory->title --}}
-                                    </td>
+                                    @if(null !==$blogCategory->getParent() )
+                                        <td @if(in_array($blogCategory->getParent()->getTitle(), [\App\Models\BlogCategory::SOME_BLOG_KEY, 1])) style="color: #ccc" @endif>
+                                            {{ $blogCategory->getParent()->getTitle() }}{{-- $item->parentCategory->title --}}
+                                        </td>
+                                    @endif
                                 </tr>
                             @endforeach
                             </tbody>
@@ -38,17 +45,21 @@
                 </div>
             </div>
         </div>
-    @if($paginator->hasPages())
-        <br>
-        <div class="row justify-content-center">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-body">
-                        {{ $paginator->links() }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
+
+        {!! $invoices->appends($frd ?? [])->render() !!}
+
+{{--    @if($blogCategories->hasPages())--}}
+
+{{--            <br>--}}
+{{--            <div class="row justify-content-center">--}}
+{{--                <div class="col-md-12">--}}
+{{--                    <div class="card">--}}
+{{--                        <div class="card-body">--}}
+{{--                            {{ $blogCategories->links() }}--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
+{{--            </div>--}}
+{{--        @endif--}}
     </div>
 @endsection
