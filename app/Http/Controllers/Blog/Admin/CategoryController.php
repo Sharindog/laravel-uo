@@ -59,6 +59,8 @@ class CategoryController extends BaseController
             compact('blogCategory', 'categoryList'));
     }
 
+
+
     public function update(BlogCategoryUpdateRequest $request, BlogCategory $blogCategory)
     {
         $data = $request->all();
