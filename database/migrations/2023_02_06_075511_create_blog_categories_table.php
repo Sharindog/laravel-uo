@@ -15,7 +15,15 @@ return new class extends Migration
     {
         Schema::create('blog_categories', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('parent_id', false)->default(1);
+
+            $table
+                ->foreignId('parent_id')
+                ->nullable()
+                ->references('id')
+                ->on('blog_categories')
+                ->nullOnDelete();
+
+//            $table->unsignedBigInteger('parent_id', false)->default(1);
 
             // slug - для ссылки транслитом, должна быть уникальна
             $table->string('slug')->unique();
