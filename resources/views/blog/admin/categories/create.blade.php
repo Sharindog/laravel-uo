@@ -1,6 +1,5 @@
 <?php
 /**@phpdoc
- * @var \App\Models\BlogCategory $item
  * @var \Illuminate\Support\ViewErrorBag $errors
  */
 ?>
@@ -8,7 +7,7 @@
 
 @section('content')
 
-    {{ Form::open(['url' => route('blog.admin.categories.update', $blogCategory), 'method' => 'PATCH']) }}
+    {{ Form::open(['url' => route('blog.admin.categories.store'), ]) }}
 
     @include('blog.admin.categories.forms._form')
 
